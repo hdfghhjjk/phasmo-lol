@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BLACKEST // HUNT JOURNAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--fg:#e8e8e8;--dim:#7a7a7a;--line:#2a2a2a;--acc:#fff;--bg:#030303;--glow:rgba(255,255,255,.25);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body.nv{--fg:#b6ffc4;--dim:#3f9a55;--line:#14502a;--acc:#59ff85;--bg:#010a04;--glow:rgba(89,255,133,.35)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.55 'Share Tech Mono',monospace;min-height:100vh;overflow-x:hidden;transition:background .4s}
+body.nv h1,body.nv .card{filter:drop-shadow(0 0 4px var(--glow))}
+.serif{font-family:'Playfair Display',serif}
+
+/* camera overlays */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px),radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.85) 100%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;opacity:.07;background-image:radial-gradient(#fff 1px,transparent 0);background-size:3px 3px;animation:grain .4s steps(3) infinite}
+@keyframes grain{0%{background-position:0 0}33%{background-position:-5px 4px}66%{background-position:4px -3px}}
+.rec{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:14px;z-index:60;font-size:11px;letter-spacing:.2em;color:var(--acc)}
+.rec i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e22;margin-right:6px;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* --- UV HANDPRINT BACKGROUND --- */
+#uv-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.uv-handprint{
+  position:absolute;
+  width:350px;height:350px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: invert(80%) sepia(100%) saturate(400%) hue-rotate(80deg) brightness(1.5) drop-shadow(0 0 8px #39ff14) drop-shadow(0 0 20px rgba(34, 139, 34, 0.9)) contrast(1.2);
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+  animation: uv-flicker 6s infinite ease-in-out;
+}
+@keyframes uv-flicker{
+  0%,100%{opacity:0.15;}
+  50%{opacity:0.10;}
+  92%{opacity:0.12;}
+  93%{opacity:0.05;} /* Моргание лампы */
+  94%{opacity:0.15;}
+}
+
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:0 16px 40px}
+/* header */
+header{text-align:center;padding:70px 0 34px;border-bottom:1px solid var(--line)}
+h1{font:900 clamp(44px,12vw,120px)/1 'Playfair Display',serif;letter-spacing:.14em;margin:0;position:relative;display:inline-block;color:var(--acc)}
+h1::before,h1::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden}
+h1::before{color:#f0f;mix-blend-mode:screen;opacity:.55;animation:gl1 4s infinite steps(1);clip-path:inset(0 0 100% 0)}
+h1::after{color:#0ff;mix-blend-mode:screen;opacity:.55;animation:gl2 4s infinite steps(1);clip-path:inset(0 0 100% 0)}
+body.nv h1::before,body.nv h1::after{color:var(--acc)}
+h1.noglitch::before,h1.noglitch::after{display:none}
+@keyframes gl1{0%,88%,100%{clip-path:inset(0 0 100% 0);transform:none}90%{clip-path:inset(20% 0 55% 0);transform:translate(-6px)}94%{clip-path:inset(65% 0 10% 0);transform:translate(5px)}}
+@keyframes gl2{0%,89%,100%{clip-path:inset(0 0 100% 0);transform:none}91%{clip-path:inset(50% 0 25% 0);transform:translate(7px)}95%{clip-path:inset(8% 0 72% 0);transform:translate(-5px)}}
+.sub{letter-spacing:.45em;color:var(--dim);font-size:11px;text-transform:uppercase;margin:14px 0 22px}
+.tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* main nav tabs */
+.main-nav{display:flex;gap:8px;justify-content:center;margin:20px 0 10px;flex-wrap:wrap}
+.main-nav button{padding:12px 22px;font-size:12px;letter-spacing:.15em;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;transition:.2s;text-transform:uppercase}
+.main-nav button.active,.main-nav button:hover{background:var(--acc);color:#000;border-color:var(--acc)}
+
+/* panels */
+main{display:grid;gap:22px;margin-top:28px;grid-template-columns:1fr}
+@media(min-width:960px){main{grid-template-columns:340px 1fr}}
+.panel{border:1px solid var(--line);background:rgba(0,0,0,.65);padding:18px;position:relative}
+.panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;border:1px solid var(--acc)}
+.panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.ph{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ph h2{font:700 18px 'Playfair Display',serif;margin:0;letter-spacing:.1em;text-transform:uppercase;color:var(--acc)}
+.ph span{font-size:10px;color:var(--dim);letter-spacing:.15em}
+select,input[type=search],button{font:inherit;color:var(--fg);background:#000;border:1px solid var(--line);padding:10px;border-radius:0;letter-spacing:.08em}
+select,input[type=search]{width:100%;text-transform:uppercase}
+select:focus,input:focus{outline:1px solid var(--acc)}
+button{cursor:pointer;text-transform:uppercase;font-size:11px;transition:.2s}
+button:hover,button.on{background:var(--acc);color:#000}
+.ev{display:flex;align-items:center;gap:12px;padding:9px 6px;cursor:pointer;border-bottom:1px dashed var(--line);user-select:none;text-transform:uppercase;letter-spacing:.08em}
+.ev:hover{color:var(--acc)}
+.ev input{appearance:none;width:16px;height:16px;border:1px solid var(--dim);margin:0;background:#000;flex:none}
+.ev input:checked{background:var(--acc);box-shadow:0 0 8px var(--glow)}
+.ev input:checked+span{color:var(--acc)}
+.bonus{margin-top:14px;border:1px dashed var(--acc);padding:10px;font-size:11px;color:var(--fg)}
+.bonus b{color:var(--acc);letter-spacing:.15em}
+.meter{height:6px;background:#111;margin:8px 0 4px;border:1px solid var(--line)}
+.meter div{height:100%;background:var(--acc);width:100%;transition:width .4s;box-shadow:0 0 8px var(--glow)}
+.row{display:flex;gap:8px;margin-top:12px}
+.row>*{flex:1}
+
+/* CARDS (Ghosts & Cursed) */
+#res, .cursed-grid {display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.card{border:1px solid var(--line);padding:14px;background:rgba(0,0,0,.55);cursor:pointer;transition:.25s;animation:in .4s both; position:relative; display: flex; flex-direction: column;}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.card:hover,.card.open{border-color:var(--acc); box-shadow: 0 0 15px rgba(255,255,255,0.05);}
+.card h3{font:700 16px 'Playfair Display',serif;margin:0;text-transform:uppercase;letter-spacing:.06em;color:var(--acc)}
+.card small{color:var(--dim);letter-spacing:.2em;font-size:10px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.tag{font-size:10px;padding:2px 7px;border:1px solid var(--line);color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.tag.hit{background:var(--acc);color:#000;border-color:var(--acc);font-weight:bold}
+.tag.lock{border-color:var(--acc);color:var(--acc)}
+.tag.fake{border-style:dashed;color:var(--acc)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px}
+.stats div{border-left:2px solid var(--acc);padding-left:7px}
+.stats em{display:block;font-style:normal;color:var(--dim);font-size:9px;letter-spacing:.2em}
+.dos{display:none;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px}
+.dos p{margin:0 0 8px}.dos em{font-style:normal;color:var(--acc);font-size:10px;letter-spacing:.2em;display:block}
+.card.open .dos{display:block}
+.hint{font-size:9px;color:var(--dim);letter-spacing:.25em;margin-top:8px;text-align:right}
+.empty{grid-column:1/-1;text-align:center;padding:40px;border:1px dashed var(--line);color:var(--dim);letter-spacing:.2em;text-transform:uppercase}
+
+/* Cursed Item specific styles */
+.cursed-card { cursor: default; }
+.cursed-card:hover { border-color: var(--acc); box-shadow: 0 0 20px rgba(89,255,133,0.1); }
+.cursed-img {
+  width: 100%; height: 180px;
+  background-color: #000;
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+  background-size: contain; 
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: 0.3s;
+  filter: grayscale(80%) contrast(1.2);
+}
+.cursed-card:hover .cursed-img { filter: grayscale(0%) contrast(1.1); }
+.cursed-desc { font-size: 12px; color: var(--dim); margin-bottom: 10px; line-height: 1.4; }
+.cursed-desc b { color: var(--acc); font-weight: normal; }
+.cursed-risk { color: #ff4d4d; font-size: 11px; margin-top: 4px; border-top: 1px dashed var(--line); padding-top: 6px;}
+
+footer{text-align:center;margin-top:40px;padding:26px 0;border-top:1px solid var(--line);font-size:10px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase}
+
+/* hide sections */
+.section{display:none}
+.section.active{display:block}
+</style>
+</head>
+<body>
+<div class="rec"><i></i>REC // CAM_03</div>
+
+<div id="uv-bg"></div>
+
+<div class="wrap">
+<header>
+<h1 data-t="BLACKEST">BLACKEST</h1>
+<div class="sub">Exclusive Investigator Team // Phasmophobia</div>
+<div class="tabs"><button id="nvb">◉ Ночное видение</button><button id="gl" class="on">▦ Глитч</button></div>
+</header>
+
+<div class="main-nav">
+  <button class="active" data-target="dossier">Досье</button>
+  <button data-target="map">Карта</button>
+  <button data-target="cursed">Проклятые предметы</button>
+</div>
+
+<div id="dossier" class="section active">
+  <main>
+  <aside>
+  <div class="panel"><div class="ph"><h2>01. Сложность</h2><span>STRICT_RULE</span></div>
+  <select id="diff">
+  <option value="p">Professional — 3 улики</option>
+  <option value="n" selected>Nightmare — 2 улики (Мимик: 3)</option>
+  <option value="i">Insanity — 1 улика (Мимик: 2)</option>
+  </select></div>
+  <div class="panel" style="margin-top:22px"><div class="ph"><h2>02. Улики</h2><span>SELECT_ACTIVE</span></div>
+  <div id="evl"></div>
+  <div class="bonus"><b>⚠ МИМИК</b><br>Всегда показывает Призрачный огонёк как дополнительную улику. Огонёк + Радио + УФ без холода — скорее Кормос.<br><br><b>🔒 ГАРАНТ</b><br>На Кошмаре и Безумии эти улики не скрываются: Деоген и Морой — радио, Горё — D.O.T.S., Ханту — холод, Обакэ — УФ.</div>
+  <div class="row"><button id="reset">✕ Сброс</button></div></div>
+  <div class="panel" style="margin-top:22px"><div class="ph"><h2>Подозреваемые</h2><span id="cnt">30/30</span></div>
+  <div class="meter"><div id="bar"></div></div>
+  <small style="color:var(--dim)">Остаётся возможных призраков</small></div>
+  </aside>
+  <section class="panel">
+  <div class="ph"><h2>03. Досье</h2><span>НАЖМИТЕ НА КАРТОЧКУ</span></div>
+  <input type="search" id="q" placeholder="Поиск призрака…" style="margin-bottom:14px">
+  <div id="res"></div>
+  </section>
+  </main>
+</div>
+
+<div id="map" class="section">
+  <section class="panel" style="margin-top:22px">
+    <div class="ph"><h2>Карта // 6 Tanglewood Drive</h2><span>РЕЙТ v0.16 // 03.2026</span></div>
+    <div class="mg">
+      <div><b>Общее описание</b>Небольшой одноэтажный дом с подвалом. 12 комнат. Отлично подходит для новичков. После реворка марта 2026 добавлены новые интерактивные элементы и мебель.</div>
+      <div><b>Кухня</b>Остров убран, старый луп вокруг него не работает. Кухня стала более закрытой.</div>
+      <div><b>Подвал</b>Стол с игрушечным поездом даёт новый луп (замена старого кухонного). Новое укрытие под лестницей.</div>
+      <div><b>Укрытия</b>Двери шкафов со щелями: видно призрака, оставаясь скрытым. Новые укрытия в спальнях, коридорах и гараже.</div>
+      <div><b>Щиток</b>Два возможных места: в гараже (на стене справа при входе) или в подвале (на стене прямо перед лестницей).</div>
+      <div><b>Выход</b>Только через главный вход. Дверь на задний дворик не открывается.</div>
+    </div>
+  </section>
+</div>
+
+<!-- ОБНОВЛЕННЫЙ РАЗДЕЛ ПРОКЛЯТЫХ ПРЕДМЕТОВ -->
+<div id="cursed" class="section">
+  <section class="panel" style="margin-top:22px">
+    <div class="ph"><h2>Проклятые предметы // 6 Tanglewood Drive</h2><span>7 ITEMS</span></div>
+    
+    <div class="cursed-grid">
+      
+      <!-- Обезьянья лапа -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('raw.png');"></div>
+        <h3>Обезьянья лапа</h3>
+        <div class="cursed-desc">
+          Гараж, на мешках с землёй.<br><br>
+          <b>Механика:</b> Загадываешь желания голосом или через текстовый интерфейс (3–5 раз в зависимости от сложности).<br><br>
+          <b>Желания:</b> «Хочу увидеть призрака» — покажет его, но запрёт дверь и запустит охоту. «Хочу активности» — удвоит активность на 2 минуты, сломает щиток и запрёт дверь. «Хочу рассудка» — всем по 50%, но скорость падения рассудка вырастет в 1,5 раза. «Хочу жить» — воскресит напарника, но с шансом 50% убьёт загадавшего. «Хочу знаний» — уберёт неверную улику, но призрак будет охотиться на тебя, а зрение и слух испортятся до конца контракта.
+        </div>
+      </div>
+
+      <!-- Карты Таро -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('tarot.png');"></div>
+        <h3>Карты Таро</h3>
+        <div class="cursed-desc">
+          Гостиная, на столике у дивана.<br><br>
+          <b>Механика:</b> В колоде 10 карт, эффект выпадает случайно.<br><br>
+          <b>Эффекты:</b> Башня (удваивает активность на 20 сек), Колесо Фортуны (меняет рассудок на ±25%), Дурак (ничего, но во время охоты выпадает всегда), Дьявол (вызывает явление призрака), Смерть (проклятая охота), Отшельник (телепортирует призрака в его комнату и запирает её на минуту), Солнце (восстанавливает 100% рассудка), Луна (сбрасывает рассудок до 0%), Верховная жрица (воскрешает мёртвого напарника).<br><br>
+          Когда все 10 карт израсходованы, все охоты до конца контракта становятся на 20 секунд длиннее.
+          <div class="cursed-risk">✖ Опасно: карта «Повешенный» (шанс 1%) мгновенно убивает того, кто её вытянул.</div>
+        </div>
+      </div>
+
+      <!-- Кукла вуду -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('voodoo.png');"></div>
+        <h3>Кукла вуду</h3>
+        <div class="cursed-desc">
+          Детская (комната Нэнси), у большого медведя.<br><br>
+          <b>Механика:</b> Каждая вонзённая игла стоит 5% рассудка. Игла в сердце — 10% и раз за контракт запускает охоту.<br><br>
+          <b>Польза:</b> Заставляет призрака взаимодействовать с предметом рядом с собой. По звуку вычисляешь его комнату и можешь поймать ЭМП-5, УФ и записи в блокноте.
+          <div class="cursed-risk">✖ Опасно: если иглами свалить рассудок до нуля — воткнутся все иголки разом и начнётся охота.</div>
+        </div>
+      </div>
+
+      <!-- Круг призыва -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('circle.png');"></div>
+        <h3>Круг призыва</h3>
+        <div class="cursed-desc">
+          Подвал, на полу.<br><br>
+          <b>Механика:</b> Зажигаешь 5 красных свечей — каждая отнимает по 16% рассудка у тех, кто рядом.<br><br>
+          <b>Польза:</b> Призрак появляется в круге на 5 секунд, свет в комнате гаснет. Идеальный способ сфотографировать призрака и выполнить задания на «стать свидетелем явления».
+          <div class="cursed-risk">✖ Опасно: сразу после появления начинается проклятая охота. Если на последней свече рассудок ниже 16%, охота начнётся почти мгновенно.</div>
+        </div>
+      </div>
+
+      <!-- Проклятое зеркало -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('mirror.png');"></div>
+        <h3>Проклятое зеркало</h3>
+        <div class="cursed-desc">
+          В коридоре, на стене у входа в мастер-спальню.<br><br>
+          <b>Механика:</b> Показывает любимую комнату призрака в реальном времени — видишь его перемещения и взаимодействия в прямом эфире.<br><br>
+          <b>Цена:</b> Каждое использование отнимает минимум 20% рассудка (7,5% в секунду, пока держишь).
+          <div class="cursed-risk">✖ Опасно: если рассудок упал до нуля — зеркало треснет и начнётся охота.</div>
+        </div>
+      </div>
+
+      <!-- Музыкальная шкатулка -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('music.png');"></div>
+        <h3>Музыкальная шкатулка</h3>
+        <div class="cursed-desc">
+          В шкафу мастер-спальни, на комоде.<br><br>
+          <b>Механика:</b> Используется один раз. Призрак начинает подпевать, и по звуку понятно, где он.<br><br>
+          <b>Польза:</b> Если призрак оказался в пределах 5 метров — появится и пойдёт к шкатулке (можно успеть сфоткать).
+          <div class="cursed-risk">✖ Опасно: в радиусе 2,5 метров рассудок падает по 2,5% в секунду. Охота начнётся, если призрак слишком близко к держащему, идёт дольше 5 секунд или шкатулку бросили во время мелодии.</div>
+        </div>
+      </div>
+
+      <!-- Уиджи -->
+      <div class="card cursed-card">
+        <div class="cursed-img" style="background-image: url('ouija.png');"></div>
+        <h3>Уиджи (доска)</h3>
+        <div class="cursed-desc">
+          В подвале, на полке под столом с поездом.<br><br>
+          <b>Механика:</b> Активируешь и задаёшь вопросы: «Где ты?», «Сколько тебе лет?», «Где кость?», «Какой у меня рассудок?». Чем полезнее вопрос, тем дороже он стоит (вопрос о местоположении съедает 50% рассудка).<br><br>
+          <b>Особый вопрос:</b> «Хочешь сыграть в прятки?» — доска пересчитает от 5 до 0, разобьётся и запустит охоту.
+          <div class="cursed-risk">✖ Опасно: если отойти от доски, не сказав «до свидания», она сгорит и начнётся охота.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<footer>EDIT BY ОХОТНИК © 2026 // NO SENSIBLE OR INFANTILE ATTITUDES</footer>
+</div>
+
+<script>
+// --- 1. UV HANDPRINT GENERATOR ---
+const uvBg = document.getElementById('uv-bg');
+const handCount = 8; 
+const hands = [];
+
+for(let i=0; i<handCount; i++){
+  const el = document.createElement('div');
+  el.className = 'uv-handprint';
+  uvBg.appendChild(el);
+  hands.push(el);
+}
+
+function randomPos(el){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const pad = 200;
+  const x = Math.random() * (w - pad*2) + pad;
+  const y = Math.random() * (h - pad*2) + pad;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  
+  const rot = Math.random() * 360;
+  const scale = 1.0 + Math.random() * 1.5; 
+  el.style.transform = `translate(-50%, -50%) rotate(${rot}deg) scale(${scale})`;
+  
+  const handsImg = ['png1.png', 'png2.png'];
+  const randomImg = handsImg[Math.floor(Math.random() * handsImg.length)];
+  
+  el.style.backgroundImage = `url('${randomImg}')`;
+}
+
+function animateHand(el){
+  randomPos(el);
+  el.style.opacity = '0.15'; 
+  
+  const showTime = 4000 + Math.random() * 6000; 
+  
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => {
+      animateHand(el);
+    }, 1000 + Math.random() * 4000); 
+  }, showTime);
+}
+
+hands.forEach((el, i) => {
+  setTimeout(() => animateHand(el), i * 800);
+});
+
+window.addEventListener('resize', () => {
+  hands.forEach(el => {
+    if(el.style.opacity !== '0') randomPos(el);
+  });
+});
+
+
+// --- 2. TABS LOGIC ---
+const navBtns = document.querySelectorAll('.main-nav button');
+const sections = document.querySelectorAll('.section');
+
+navBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    navBtns.forEach(b => b.classList.remove('active'));
+    sections.forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    const targetId = btn.getAttribute('data-target');
+    document.getElementById(targetId).classList.add('active');
+  });
+});
+
+
+// --- 3. GHOST DATA (Detailed) ---
+const E={emf:"ЭМП 5",box:"Радиоприёмник",fingerprints:"Ультрафиолет",orb:"Призрачный огонёк",writing:"Блокнот",freezing:"Минус-температура",dots:"D.O.T.S."};
+
+// Формат: [Имя, Рус, Улики, Порог охоты, Скорость, Особенность, Тест]
+const G=[
+["Spirit","Дух","emf,box,writing","50%","1.7 м/с","Благовоние блокирует охоту на 180 секунд (3 минуты) — это его главная фишка. У всех остальных призраков эффект от благовония обычно длится 90 секунд.","Тест: используйте благовоние. Если пауза до следующей охоты составит 180 секунд (вместо стандартных 90), это Дух."],
+["Wraith","Мираж","emf,box,dots","50%","1.7 м/с","Никогда не наступает на соль и не оставляет в ней следов, просто проходит сквозь кучки. Вне охоты может телепортироваться к случайному игроку, оставляя ЭМП 2.","Тест: рассыпьте соль. Если призрак прошёл сквозь неё, не оставив следов — это Мираж."],
+["Phantom","Фантом","box,fingerprints,dots","50%","1.7 м/с","Исчезает после успешной фотографии (на снимке его не видно). Во время охоты дольше всех остаётся невидимым в моменты мерцания, а вблизи него рассудок капает на 0,5% в секунду.","Тест: посмотрите на призрака во время события (не охоты). Рассудок должен резко упасть. Также проверьте фото."],
+["Poltergeist","Полтергейст","box,fingerprints,writing","50%","1.7 м/с","Может швырнуть сразу несколько предметов разом, каждый брошенный предмет отнимает 2% рассудка всем в комнате. Без предметов рядом почти беспомощен.","Тест: соберите все предметы в одну кучу. Если они разлетятся одновременно — это Полтергейст."],
+["Banshee","Банши","fingerprints,orb,dots","50%*","1.7 м/с","Выбирает одну «жертву» и охотится только по её рассудку; во время охоты убивает только её. Издаёт уникальный крик через параболический микрофон. Всегда женского пола.","Тест: если призрак проходит мимо одного игрока и целенаправленно идёт к другому (или атакует только его) — это Банши."],
+["Jinn","Джинн","emf,fingerprints,freezing","50%","1.7 / 2.5 м/с","Не может выключить электрощиток. Пока щиток включён, при погоне разгоняется до 2,5 м/с и умеет одним касанием щитка слить 25% рассудка игроку рядом.","Тест: включите щиток и убегайте. Если призрак догоняет вас с огромной скоростью (2.5 м/с), но замедляется вплотную — это Джинн."],
+["Mare","Мара","box,orb,writing","60% (40% при свете)","1.7 м/с","Никогда не включает свет. В темноте охотится при 60% рассудка, при включённом свете — только при 40%. Может мгновенно погасить свет, который вы только что включили рядом.","Тест: включите свет в комнате. Если призрак сразу его выключит или начнёт охоту — это Мара."],
+["Revenant","Ревенант","orb,writing,freezing","50%","1.0 / 3.0 м/с","Ходит медленно (1 м/с), пока не заметит игрока, а после обнаружения рвётся с 3 м/с. При зрительном контакте дополнительно не ускоряется.","Тест: спрячьтесь. Если призрак идёт медленно, но как только вы попадаете в поле его зрения — резко ускоряется, это Ревенант."],
+["Shade","Тень","emf,writing,freezing","35%","1.7 м/с","Самый стеснительный: не охотится, не пишет в блокнот и не делает события, если игрок в одной с ним комнате. Порог охоты всего 35%, чаще появляется тенью.","Тест: если призрак отказывается охотиться, пока вы стоите рядом с ним, но начинает охоту, как только вы уходите — это Тень."],
+["Demon","Демон","fingerprints,writing,freezing","70%","1.7 м/с","Единственный, кто может начать охоту при любом рассудке, даже 100%. Между охотами всего 20 секунд, благовония защищают от него лишь 60 секунд, зато радиус распятий у него увеличен.","Тест: если охота начинается без предупреждения на высоком рассудке, и распятие не спасает — это Демон."],
+["Yurei","Юрэй","orb,freezing,dots","50%","1.7 м/с","Способность «хлопка дверью»: резко закрывает дверь и снимает 15% рассудка всем в радиусе 7,5 м. Всегда открывает/закрывает двери до упора и умеет двигать входную дверь дома.","Тест: если после использования благовония в комнате призрак не может из неё выйти — это Юрэй."],
+["Oni","Они","emf,freezing,dots","50%","1.7 м/с","Становится активнее, когда игроки рядом; события отнимают 20% рассудка вместо 10%. Во время охоты появляется в полной форме и виден дольше всех, никогда не «туманится».","Тест: если призрак очень часто появляется в виде фигуры и много взаимодействует — это Они."],
+["Yokai","Ёкай","box,orb,dots","50%","1.7 м/с","Разговоры голосовым чатом рядом поднимают его порог охоты до 80%. Зато во время охоты почти глухой: слышит только в радиусе 2,5 м.","Тест: говорите в микрофон. Если призрак начинает охоту при высоком рассудке (80%), это Ёкай."],
+["Hantu","Ханту","fingerprints,orb,freezing","50%","1.4–2.7 м/с","Чем холоднее комната, тем быстрее: до 2,7 м/с в морозе, всего 1,4 м/с в тепле. Не может включить щиток, при выключенном щитке видно ледяное дыхание изо рта во время охоты.","Тест: выключите отопление (щиток). Если призрак двигается очень быстро в холодной комнате и медленно в тёплой — это Ханту."],
+["Goryo","Горё","emf,fingerprints,dots","50%","1.7 м/с","Силуэт D.O.T.S. виден только через видеокамеру и только когда в комнате никого нет. Почти не покидает любимую комнату и не может её сменить.","Тест: смотрите в камеру, пока призрак один в комнате. Если видите D.O.T.S. — это Горё."],
+["Myling","Мюлинг","emf,fingerprints,writing","50%","1.7 м/с","Во время охоты почти бесшумен: шаги слышны только с 12 метров (у других — с ~20). Зато чаще всех шепчет в параболический микрофон.","Тест: во время охоты шаги очень тихие, и вы слышите их только когда призрак уже рядом — это Мюлинг."],
+["Onryo","Онрё","box,orb,freezing","60%","1.7 м/с","Тушит источники огня; затушив три свечи подряд, начинает охоту независимо от рассудка. Горящая свеча рядом с ним работает как распятие.","Тест: поставьте свечу. Если призрак тушит её и сразу начинает охоту на высоком рассудке — это Онрё."],
+["The Twins","Близнецы","emf,box,freezing","50%","1.5 / 1.9 м/с","Взаимодействуют с предметами сразу в двух местах (одно — на огромном удалении). Во время охоты скорость случайна: 1,5 м/с у медленного близнеца или 1,9 м/с у быстрого.","Тест: если вы видите, как в одной комнате призрак взаимодействует с предметом, а в другой в это же время происходит событие — это Близнецы."],
+["Raiju","Райдзю","emf,orb,dots","65% (рядом с электроникой)","1.7 → 2.5 м/с","Разгоняется до 2,5 м/с рядом с включённой электроникой и охотится при 65% рассудка, если техника активна. Радиус помех электроники больше обычного (6–10 м в зависимости от карты).","Тест: включите приборы и убегайте. Если рядом с электроникой призрак очень быстрый, а без неё медленный — это Райдзю."],
+["Obake","Обакэ","emf,fingerprints,orb","50%","1.7 м/с","Оставляет уникальные отпечатки: шесть пальцев на дверях, два на выключателях, пять на клавиатурах. Может оставить двойной отпечаток на выключателе, иногда вообще без отпечатка, а во время охоты меняет внешность при мерцании.","Тест: проверьте отпечатки. Если увидите 6 пальцев или отпечаток пропадёт слишком быстро — это Обакэ."],
+["The Mimic","Мимик","box,fingerprints,freezing,orb","50%","1.7 м/с","Копирует любого призрака: способность, скорость, порог охоты. Всегда выдаёт призрачный огонёк, даже на сложности без улик, — четвёртая улика — верный признак мимика.","Тест: если есть все улики Кормоса, но есть огонёк, или поведение не сходится с уликами — это Мимик."],
+["Moroi","Морой","box,writing,freezing","50%","1.5–2.25 м/с","Проклинает игроков, услышавших его голос (рассудок падает вдвое быстрее), и разгоняется тем сильнее, чем ниже общий рассудок команды — до 2,25 м/с. Благовония слепят его дольше обычного.","Тест: используйте таблетки от рассудка. Если скорость призрака резко упала — это Морой."],
+["Deogen","Деоген","box,writing,dots","40%","3.0 / 0.4 м/с","Всегда знает, где вы: спрятаться от него невозможно. Летит на 3 м/с издалека, но у самой цели замедляется до 0,4 м/с. В радиоприёмник отвечает тяжёлым дыханием.","Тест: если призрак найдёт вас даже в шкафу, но вплотную будет еле ползти — это Деоген."],
+["Thaye","Тайэ","orb,writing,dots","75% (падает со временем)","2.75 → 1.0 м/с","«Стареет» в течение контракта: в начале очень быстрый и гиперактивный (2,75 м/с, охота при 75%), но с каждым возрастом медленнее и спокойнее.","Тест: если призрак был очень быстрым в начале, но через 10 минут игры стал медленным — это Тайэ."],
+["Aswang","Асванг","dots,freezing,writing","—","—","Медленный (1,53 м/с), но ускоряется при зрительном контакте сильнее всех. Если нашёл игрока в укрытии — охота заканчивается, а в следующую охотится сразу, без «грацепериода», идя прямо в это укрытие.","Тест: спрячьтесь. Если он не убил вас в первый раз, а во второй пришёл прямо к вашему укрытию — это Асванг."],
+["Dieldegast","Дейльдегаст","emf,writing,dots","—","—","Стартует контракт на 3 м/с и замедляется на 0,1 м/с за каждый передвинутый игроками предмет (минимум 0,4 м/с). После охоты или распятия снова 3 м/с. Реже остальных трогает двери и выключатели.","Тест: если за одну охоту он бросил огромное количество разных предметов, это он."],
+["Dayan","Дайан","emf,orb,box","65% (игрок рядом двигается) / 45% (стоит)","2.25 м/с (движение в 10 м) / 1.2 м/с (стоите)","Всегда женского пола. Реагирует на движение: рядом с идущим игроком разгоняется до 2,25 м/с и охотится при 65%, рядом со стоящим — ползёт на 1,2 м/с и охотится при 45%.","Тест: замрите в 10 м от неё во время охоты — она должна резко замедлиться."],
+["Gallu","Галлу","emf,fingerprints,box","50% (злой 60% / слабый 40%)","1.7 / 1.96 / 1.36 м/с","Живёт в трёх состояниях: обычном, ярости и ослабления. Состояние меняется от распятий, благовоний и соли; в ярости он быстрее и «съедает» радиус распятия, в ослаблении — медленный.","Тест: сравните скорость охоты до и после использования соли или благовония."],
+["Kormos","Кормос","orb,box,fingerprints","—","—","Слеп: видит только звуки шагов (бегущего слышит с 30 метров). Если рядом бегают, охотится при 70% рассудка.","Тест: замрите и молчите во время охоты — пройдёт мимо."],
+["Obambo","Обамбо","writing,fingerprints,dots","10% (спокоен) / 65% (агрессивен)","1.45 / 1.96 м/с","Два состояния: спокойное (медленный, пассивный, охота при 10%) и агрессивное (быстрый, охота при 65%). Состояния переключаются каждые ~2 минуты.","Тест: если призрак охотится очень рано, но охота быстро заканчивается — это Обамбо."]
+].map(a=>({n:a[0],r:a[1],e:a[2].split(","),h:a[3],s:a[4],t:a[5],test:a[6]}));
+
+const F={Goryo:"dots",Deogen:"box",Moroi:"box",Hantu:"freezing",Obake:"fingerprints"};
+const $=id=>document.getElementById(id);
+
+
+// --- 4. RENDER LOGIC ---
+$("evl").innerHTML=Object.entries(E).map(([k,v])=>`<label class="ev"><input type="checkbox" value="${k}"><span>${v}</span></label>`).join("");
+
+function render(){
+ const sel=[...document.querySelectorAll(".ev input:checked")].map(c=>c.value);
+ const d=$("diff").value;
+ const q=$("q").value.trim().toLowerCase();
+ let n=0,html="";
+ 
+ G.forEach(g=>{
+  const m=g.n==="The Mimic";
+  const lim=d==="p"?3:d==="n"?(m?3:2):(m?2:1);
+  const ok=sel.every(e=>g.e.includes(e))&&sel.length<=lim;
+  
+  if(ok)n++;
+  
+  if(!ok||(q&&!(g.n+g.r).toLowerCase().includes(q)))return;
+  
+  const tags=g.e.map(e=>{
+    const lk=d!=="p"&&F[g.n]===e;
+    return `<span class="tag${sel.includes(e)?" hit":""}${m&&e==="orb"?" fake":""}${lk?" lock":""}">${lk?"🔒 ":""}${E[e]}${m&&e==="orb"?" (бонус)":""}</span>`;
+  }).join("");
+  
+  html+=`<div class="card" onclick="this.classList.toggle('open')">
+    <small>${g.n}</small>
+    <h3>${g.r}</h3>
+    <div class="tags">${tags}</div>
+    <div class="stats">
+      <div><em>ОХОТА С</em>${g.h}</div>
+      <div><em>СКОРОСТЬ</em>${g.s}</div>
+    </div>
+    <div class="dos">
+      <em>ОСОБЕННОСТЬ</em>
+      <p>${g.t}</p>
+      <em>КАК ОПРЕДЕЛИТЬ</em>
+      <p style="color: #fff;">${g.test}</p>
+    </div>
+    <div class="hint">ДОСЬЕ +</div>
+  </div>`;
+ });
+ 
+ $("res").innerHTML=html||`<div class="empty">${sel.length>(d==="p"?3:d==="n"?2:1)?"Слишком много улик для этой сложности":"Совпадений нет. Проверьте записи."}</div>`;
+ 
+ $("cnt").textContent=n+"/"+G.length;
+ $("bar").style.width=n/G.length*100+"%";
+}
+
+document.querySelectorAll(".ev input").forEach(c=>c.addEventListener("change",render));
+$("diff").addEventListener("change",render);
+$("q").addEventListener("input",render);
+$("reset").onclick=()=>{
+  document.querySelectorAll(".ev input").forEach(c=>c.checked=false);
+  $("q").value="";
+  render();
+};
+
+// --- 5. GLITCH & NIGHT VISION CONTROLS ---
+$("nvb").onclick=()=>{
+  document.body.classList.toggle("nv");
+  $("nvb").classList.toggle("on");
+};
+$("gl").onclick=()=>{
+  const h=document.querySelector("h1");
+  const off=h.dataset.off!=="1";
+  h.dataset.off=off?"1":"0";
+  h.classList.toggle("noglitch",off);
+  $("gl").classList.toggle("on",!off);
+};
+
+// Initial render
+render();
+</script>
+</body>
+</html>
